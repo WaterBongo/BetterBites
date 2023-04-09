@@ -203,7 +203,6 @@
             />
           </form>
         </div>
-
         <img
           src="./images/loading.gif"
           alt="loading sign"
@@ -211,6 +210,7 @@
           style="display: none"
           class="cloche"
         />
+        <p class="u-text" id="loading-text"></p>
         <h6 class="u-text" id="response"></h6>
         <p class="u-text" id="response-why"></p>
         <img
@@ -239,7 +239,7 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        document.getElementById("loading").style = "display: block;";
+        showLoading();
 
         const options = {
           food: document.getElementById("name-8fe3").value,
@@ -258,7 +258,54 @@
         fetchAlternatives(options);
       });
 
+      const showLoading = () => {
+        document.getElementById("loading").style = "display: block;";
+        document.getElementById("loading-text").style = "display: block;";
+        document.getElementById("cloche-top").style = "display: none;";
+        document.getElementById("cloche-bottom").style = "display: none;";
+        document.getElementById("response-why").style = "display: none;";
+        document.getElementById("response").style = "display: none;";
+      };
+
+      const showResults = async (responseJSON) => {
+        const why = responseJSON.why;
+        const newFood = responseJSON.alternative_food;
+        const old = responseJSON.old_food;
+        const nutritionOld = responseJSON.nutrition_facts.old;
+        const nutritionNew = responseJSON.nutrition_facts.new;
+        const location = await fetchLocation(newFood);
+
+        const responseEl = document.getElementById("response");
+        const responseParagraph = document.getElementById("response-why");
+
+        document.getElementById("loading").style = "display: none;";
+        document.getElementById("loading-text").style = "display: none;";
+
+        responseEl.style = "display: block;";
+        responseParagraph.style = "display: block;";
+        document.getElementById("cloche-top").style = "display: block;";
+        document.getElementById("cloche-bottom").style = "display: block;";
+
+        responseEl.innerText = `Your alternative food: ${newFood}
+
+        Nearest place to buy it: ${location}
+        `;
+
+        responseParagraph.innerText = `Why?: ${why}
+
+        Average nutrition facts of a serving of ${old}:
+        Calories: ${nutritionOld.calories}
+        Fat: ${nutritionOld.total_fat}
+
+        Average nutrition facts of a serving of ${newFood}:
+        Calories: ${nutritionNew.calories}
+        Fat: ${nutritionNew.total_fat}
+        `;
+      };
+
       const fetchLocation = async (food) => {
+        document.getElementById("loading-text").innerText =
+          "Finding a location near you...";
         const myLocation = await locationPromise;
 
         if (myLocation == "") return "not found";
@@ -279,6 +326,8 @@
       };
 
       const fetchAlternatives = async (food) => {
+        document.getElementById("loading-text").innerText =
+          "Searching for alternatives...";
         const response = await fetch("https://1.gpu.garden:8337/alternative", {
           method: "POST",
           headers: {
@@ -287,36 +336,7 @@
           body: JSON.stringify(food),
         });
 
-        const responseJSON = await response.json();
-        const why = responseJSON.why;
-        const newFood = responseJSON.alternative_food;
-        const old = responseJSON.old_food;
-        const nutritionOld = responseJSON.nutrition_facts.old;
-        const nutritionNew = responseJSON.nutrition_facts.new;
-        const location = await fetchLocation(newFood);
-
-        const responseEl = document.getElementById("response");
-        const responseParagraph = document.getElementById("response-why");
-
-        document.getElementById("loading").style = "display: none;";
-        document.getElementById("cloche-top").style = "display: block;";
-        document.getElementById("cloche-bottom").style = "display: block;";
-
-        responseEl.innerText = `Your alternative food: ${newFood}
-
-        Nearest place to buy it: ${location}
-        `;
-
-        responseParagraph.innerText = `Why?: ${why}
-
-        Average nutrition facts of a serving of ${old}:
-        Calories: ${nutritionOld.calories}
-        Fat: ${nutritionOld.total_fat}
-
-        Average nutrition facts of a serving of ${newFood}:
-        Calories: ${nutritionNew.calories}
-        Fat: ${nutritionNew.total_fat}
-        `;
+        showResults(await response.json());
       };
     </script>
     <style>
@@ -327,6 +347,10 @@
       .cloche {
         width: 40%;
         margin: 0 auto;
+      }
+
+      #loading-text {
+        text-align: center;
       }
     </style>
   </body>
