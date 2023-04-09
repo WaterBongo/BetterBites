@@ -37,9 +37,11 @@ please also dont say anything else but the response.
 
 #AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8
 
-def find_location_with_food(food_to_find):
+def find_location_with_food(food_to_find,user_location):
     url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
     params = {
+        #please search in california
+        'location': user_location,
         'query': food_to_find,
         'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
     }
@@ -66,11 +68,19 @@ def find_location_with_food(food_to_find):
     else:
         print("Request failed")
 
-
+# def address_to_Long_Lat(address):
+#     #use the google api to turn the address into a longituide and latituide
+#     url = 'https://maps.googleapis.com/maps/api/geocode/json'
+#     params = {
+#         'address': address,
+#         'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
+#     }
+#     response = requests.get
 
 @app.route('/')
 def index():
     return 'Hello world'
+
 
 
 
@@ -100,6 +110,7 @@ def alternatives():
 @app.route('/near',methods=['POST'])
 def near():
     food = request.json['food']
-    location = find_location_with_food(food)
+    user_location = request.json['location']
+    location = find_location_with_food(food,user_location)
     return {'place':location[0],'address':location[1]}
 app.run('0.0.0.0',port=8080)
