@@ -77,7 +77,7 @@ def find_location_with_food(food_to_find,user_location):
 #     url = 'https://maps.googleapis.com/maps/api/geocode/json'
 #     params = {
 #         'address': address,
-#         'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
+#         'key': ''
 #     }
 #     response = requests.get
 
