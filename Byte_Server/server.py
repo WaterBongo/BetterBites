@@ -3,7 +3,12 @@ from flask import request
 import openai,json,ast,requests,flask_cors
 from flask_cors import CORS
 
-openai.api_key = "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"
+config_json = open('config.json', 'r')
+config = json.load(config_json)
+openai.api_key = config['openai_key']
+maps_api = config['maps_api']
+config_json.close()
+
 
 
 app = flask.Flask('nutrition')
@@ -12,7 +17,7 @@ def find_food(food):
     msgs = []
     msgs.append({"role": "system", "content": """
 please respond to my questions with the format 
-please also dont say anything else but the response.
+please also dont say anything else but the responses
 
 {'old_food' : [the food that we need to find the alternative for], 
 'alternative_food' : [alternative food please dont use any punctionation],
@@ -35,7 +40,6 @@ please also dont say anything else but the response.
     print(e['choices'][0]['message']['content'])
     return e['choices'][0]['message']['content']
 
-#AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8
 
 def find_location_with_food(food_to_find,user_location):
     url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
@@ -43,7 +47,7 @@ def find_location_with_food(food_to_find,user_location):
         #please search in california
         'location': user_location,
         'query': food_to_find,
-        'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
+        'key': maps_api
     }
 
     # Send a GET request to the API endpoint
@@ -111,6 +115,8 @@ def alternatives():
 def near():
     food = request.json['food']
     user_location = request.json['location']
+    if user_location == '':
+        user_location = '34.0522,-118.2437'
     location = find_location_with_food(food,user_location)
     return {'place':location[0],'address':location[1]}
 app.run('0.0.0.0',port=8080)
