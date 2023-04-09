@@ -267,7 +267,7 @@
 
       const fetchLocation = async (food) => {
         if ((userLocation = "")) return "not found";
-        const response = await fetch("http://1.gpu.garden:8337/near", {
+        const response = await fetch("https://1.gpu.garden:8337/near", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -285,7 +285,7 @@
       };
 
       const fetchAlternatives = async (food) => {
-        const response = await fetch("http://1.gpu.garden:8337/alternative", {
+        const response = await fetch("https://1.gpu.garden:8337/alternative", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
