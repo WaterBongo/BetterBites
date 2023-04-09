@@ -18,11 +18,11 @@ please also dont say anything else but the response.
 'alternative_food' : [alternative food please dont use any punctionation],
 'why' : [why is this a good alternative],
 'nutrition_facts' : {
-"the food we need to find a alternative for" : {
+"old" : {
 "calories" : 'calorie of food (please only put a number, not letters)',
 "total_fat" : "total fat"(please only put a number, not letters),
 },
-"the alternative food" : "give the same format of nutiriion as the [food we need to find a alternative for]",
+"new" : "give the same format of nutiriion as the [food we need to find a alternative for]",
 
       }
 }    
