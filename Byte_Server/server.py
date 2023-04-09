@@ -1,5 +1,5 @@
 import flask
-from flask import request
+from flask import request,redirect
 import openai,json,ast,requests,flask_cors
 from flask_cors import CORS
 
@@ -83,7 +83,8 @@ def find_location_with_food(food_to_find,user_location):
 
 @app.route('/')
 def index():
-    return 'Hello world'
+    #redirect to https://better-bites-six.vercel.app/
+    return redirect('https://better-bites-six.vercel.app/',code=302)
 
 
 
@@ -119,4 +120,4 @@ def near():
         user_location = '34.0522,-118.2437'
     location = find_location_with_food(food,user_location)
     return {'place':location[0],'address':location[1]}
-app.run('0.0.0.0',port=8080)
+app.run('0.0.0.0',port=8080,ssl_context='adhoc')

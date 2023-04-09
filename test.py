@@ -1,3 +1,2 @@
-rewtew = {'location' : ''}
-if rewtew:
-    print("hello")
+print("hello world"[::-1])
+
