@@ -1,5 +1,5 @@
 import flask
-from flask import request,redirect
+from flask import request,redirect,render_template
 import openai,json,ast,requests,flask_cors
 from flask_cors import CORS
 
@@ -77,7 +77,7 @@ def find_location_with_food(food_to_find,user_location):
 #     url = 'https://maps.googleapis.com/maps/api/geocode/json'
 #     params = {
 #         'address': address,
-#         'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
+#         'key': '  '
 #     }
 #     response = requests.get
 
@@ -118,6 +118,7 @@ def near():
     user_location = request.json['location']
     if user_location == '':
         user_location = '34.0522,-118.2437'
+    print(user_location)
     location = find_location_with_food(food,user_location)
     return {'place':location[0],'address':location[1]}
 app.run('0.0.0.0',port=8080,ssl_context='adhoc')
