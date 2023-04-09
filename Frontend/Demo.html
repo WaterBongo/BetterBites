@@ -193,28 +193,33 @@
                 value="submit"
                 class="u-border-none u-btn u-btn-submit u-button-style u-palette-3-base u-radius-15 u-btn-1"
               />
-              <!-- <a
-                href="#"
-                class="u-border-none u-btn u-btn-submit u-button-style u-palette-3-base u-radius-15 u-btn-1"
-                >Find alternative</a
-              > -->
             </div>
-            <div class="u-form-send-message u-form-send-success">
-              Thank you! Your message has been sent.
-            </div>
-            <div class="u-form-send-error u-form-send-message">
-              Unable to send your message. Please fix errors then try again.
-            </div>
-            <input type="hidden" value="" name="recaptchaResponse" />
-            <input
-              type="hidden"
-              name="formServices"
-              value="9bda1f421f1761c06978e4e8c9ff983b"
+            <img
+              src="./images/top.png"
+              alt="top of cloche"
+              id="cloche-top"
+              style="display: none"
+              class="cloche"
             />
           </form>
         </div>
+
+        <img
+          src="./images/loading.gif"
+          alt="loading sign"
+          id="loading"
+          style="display: none"
+          class="cloche"
+        />
         <h6 class="u-text" id="response"></h6>
         <p class="u-text" id="response-why"></p>
+        <img
+          src="./images/bottom.png"
+          alt="bottom of cloche"
+          id="cloche-bottom"
+          style="display: none"
+          class="cloche"
+        />
       </div>
     </section>
 
@@ -234,6 +239,8 @@
       form.addEventListener("submit", (e) => {
         e.preventDefault();
 
+        document.getElementById("loading").style = "display: block;";
+
         const options = {
           food: document.getElementById("name-8fe3").value,
           lowCarb: document.getElementById("field-e7f9").checked,
@@ -248,15 +255,18 @@
               fetchAlternatives(options);
             },
             (error) => {
-              document.getElementById("response").innerText = error;
+              console.log(error);
+              fetchAlternatives(options);
             }
           );
         } else {
-          return "Geolocation is not supported by this browser.";
+          console.log("Geolocation is not supported by this browser.");
+          fetchAlternatives(options);
         }
       });
 
       const fetchLocation = async (food) => {
+        if ((userLocation = "")) return "not found";
         const response = await fetch("http://1.gpu.garden:8337/near", {
           method: "POST",
           headers: {
@@ -266,7 +276,8 @@
         });
 
         const responseJSON = await response.json();
-        if (responseJSON.place == "false") {
+        console.log(responseJSON);
+        if (!responseJSON.place) {
           return "not found";
         } else {
           return `${responseJSON.place}, ${responseJSON.address}`;
@@ -293,6 +304,10 @@
         const responseEl = document.getElementById("response");
         const responseParagraph = document.getElementById("response-why");
 
+        document.getElementById("loading").style = "display: none;";
+        document.getElementById("cloche-top").style = "display: block;";
+        document.getElementById("cloche-bottom").style = "display: block;";
+
         responseEl.innerText = `Your alternative food: ${newFood}
 
         Nearest place to buy it: ${location}
@@ -313,6 +328,11 @@
     <style>
       .response {
         font-weight: 500 !important;
+      }
+
+      .cloche {
+        width: 40%;
+        margin: 0 auto;
       }
     </style>
   </body>
