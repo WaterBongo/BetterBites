@@ -3,12 +3,7 @@ from flask import request
 import openai,json,ast,requests,flask_cors
 from flask_cors import CORS
 
-config_files = open('./config.json', 'r')
-config = json.load(config_files)
-openai.api_key = config['openai_key']
-maps_api = config['maps_api']
-config_files.close()
-
+openai.api_key = "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"
 
 
 app = flask.Flask('nutrition')
@@ -40,6 +35,7 @@ please also dont say anything else but the response.
     print(e['choices'][0]['message']['content'])
     return e['choices'][0]['message']['content']
 
+#AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8
 
 def find_location_with_food(food_to_find,user_location):
     url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
@@ -47,7 +43,7 @@ def find_location_with_food(food_to_find,user_location):
         #please search in california
         'location': user_location,
         'query': food_to_find,
-        'key': maps_api
+        'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
     }
 
     # Send a GET request to the API endpoint
