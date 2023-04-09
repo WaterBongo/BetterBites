@@ -47,7 +47,7 @@ def find_location_with_food(food_to_find,user_location):
         #please search in california
         'location': user_location,
         'query': food_to_find,
-        'key': 'AIzaSyDximrySZEr37jflb65cjUg-AP41rLuhm8'
+        'key': maps_api
     }
 
     # Send a GET request to the API endpoint
