@@ -111,6 +111,8 @@ def alternatives():
 def near():
     food = request.json['food']
     user_location = request.json['location']
+    if user_location == '':
+        user_location = '34.0522,-118.2437'
     location = find_location_with_food(food,user_location)
     return {'place':location[0],'address':location[1]}
 app.run('0.0.0.0',port=8080)
