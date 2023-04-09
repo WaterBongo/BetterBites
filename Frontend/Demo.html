@@ -234,7 +234,7 @@
       </div>
     </footer>
     <script defer>
-      var userLocation = "";
+      var locationPromise;
       const form = document.getElementById("betterbites-form");
       form.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -248,35 +248,29 @@
           dairyFree: document.getElementById("field-ee71").checked,
         };
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            (position) => {
-              userLocation = `${position.coords.latitude}, ${position.coords.longitude}`;
-              fetchAlternatives(options);
-            },
-            (error) => {
-              console.log(error);
-              fetchAlternatives(options);
-            }
-          );
-        } else {
-          console.log("Geolocation is not supported by this browser.");
-          fetchAlternatives(options);
-        }
+        locationPromise = new Promise((myResolve) => {
+          navigator.geolocation.getCurrentPosition((position) => {
+            myResolve(
+              `${position.coords.latitude}, ${position.coords.longitude}`
+            );
+          });
+        });
+        fetchAlternatives(options);
       });
 
       const fetchLocation = async (food) => {
-        if ((userLocation = "")) return "not found";
+        const myLocation = await locationPromise;
+
+        if (myLocation == "") return "not found";
         const response = await fetch("https://1.gpu.garden:8337/near", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ food, location: userLocation }),
+          body: JSON.stringify({ food, location: myLocation }),
         });
 
         const responseJSON = await response.json();
-        console.log(responseJSON);
         if (!responseJSON.place) {
           return "not found";
         } else {
