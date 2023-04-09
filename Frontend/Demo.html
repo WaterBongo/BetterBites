@@ -194,15 +194,15 @@
                 class="u-border-none u-btn u-btn-submit u-button-style u-palette-3-base u-radius-15 u-btn-1"
               />
             </div>
-            <img
-              src="./images/top.png"
-              alt="top of cloche"
-              id="cloche-top"
-              style="display: none"
-              class="cloche"
-            />
           </form>
         </div>
+        <img
+          src="./images/top.png"
+          alt="top of cloche"
+          id="cloche-top"
+          style="display: none"
+          class="cloche"
+        />
         <img
           src="./images/loading.gif"
           alt="loading sign"
@@ -212,6 +212,8 @@
         />
         <p class="u-text" id="loading-text"></p>
         <h6 class="u-text" id="response"></h6>
+        <a class="u-text" target="_blank" id="location"></a>
+
         <p class="u-text" id="response-why"></p>
         <img
           src="./images/bottom.png"
@@ -248,12 +250,17 @@
           dairyFree: document.getElementById("field-ee71").checked,
         };
 
-        locationPromise = new Promise((myResolve) => {
-          navigator.geolocation.getCurrentPosition((position) => {
-            myResolve(
-              `${position.coords.latitude}, ${position.coords.longitude}`
-            );
-          });
+        locationPromise = new Promise((myResolve, myReject) => {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              myResolve(
+                `${position.coords.latitude}, ${position.coords.longitude}`
+              );
+            },
+            (error) => {
+              myResolve(null);
+            }
+          );
         });
         fetchAlternatives(options);
       });
@@ -265,6 +272,8 @@
         document.getElementById("cloche-bottom").style = "display: none;";
         document.getElementById("response-why").style = "display: none;";
         document.getElementById("response").style = "display: none;";
+        document.getElementById("location").style = "display: none;";
+        document.getElementById("loading").src = "./images/loading.gif";
       };
 
       const showResults = async (responseJSON) => {
@@ -277,21 +286,31 @@
 
         const responseEl = document.getElementById("response");
         const responseParagraph = document.getElementById("response-why");
+        const responseLocation = document.getElementById("location");
 
         document.getElementById("loading").style = "display: none;";
         document.getElementById("loading-text").style = "display: none;";
 
         responseEl.style = "display: block;";
+        responseLocation.style = "display: inline;";
         responseParagraph.style = "display: block;";
         document.getElementById("cloche-top").style = "display: block;";
         document.getElementById("cloche-bottom").style = "display: block;";
 
         responseEl.innerText = `Your alternative food: ${newFood}
 
-        Nearest place to buy it: ${location}
-        `;
 
-        responseParagraph.innerText = `Why?: ${why}
+        Nearest place to buy it:`;
+        if (location == "not found") {
+          responseLocation.innerText = "not found";
+        } else {
+          responseLocation.innerText = `${location.place}, ${location.address}`;
+          responseLocation.href =
+            "https://www.google.com/maps/place/" + location.address;
+        }
+
+        responseParagraph.innerText = `
+        Why?: ${why}
 
         Average nutrition facts of a serving of ${old}:
         Calories: ${nutritionOld.calories}
@@ -307,6 +326,9 @@
         document.getElementById("loading-text").innerText =
           "Finding a location near you...";
         const myLocation = await locationPromise;
+        if (myLocation === null) {
+          return "User location not found";
+        }
 
         if (myLocation == "") return "not found";
         const response = await fetch("https://1.gpu.garden:8337/near", {
@@ -321,27 +343,33 @@
         if (!responseJSON.place) {
           return "not found";
         } else {
-          return `${responseJSON.place}, ${responseJSON.address}`;
+          return { place: responseJSON.place, address: responseJSON.address };
         }
       };
 
       const fetchAlternatives = async (food) => {
         document.getElementById("loading-text").innerText =
           "Searching for alternatives...";
-        const response = await fetch("https://1.gpu.garden:8337/alternative", {
+        const response = fetch("https://1.gpu.garden:8337/alternative", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(food),
-        });
-
-        showResults(await response.json());
+        })
+          .then(async (response) => {
+            showResults(await response.json());
+          })
+          .catch(() => {
+            document.getElementById("loading-text").innerText =
+              "Not found, try again.";
+            document.getElementById("loading").src = "./images/error.png";
+          });
       };
     </script>
     <style>
       .response {
-        font-weight: 500 !important;
+        font-weight: 400;
       }
 
       .cloche {
@@ -351,6 +379,10 @@
 
       #loading-text {
         text-align: center;
+      }
+
+      a {
+        color: rgb(65, 164, 213);
       }
     </style>
   </body>
