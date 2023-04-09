@@ -282,7 +282,7 @@
         const old = responseJSON.old_food;
         const nutritionOld = responseJSON.nutrition_facts.old;
         const nutritionNew = responseJSON.nutrition_facts.new;
-        const location = await fetchLocation(newFood);
+        const storeLocation = await fetchLocation(newFood);
 
         const responseEl = document.getElementById("response");
         const responseParagraph = document.getElementById("response-why");
@@ -301,12 +301,12 @@
 
 
         Nearest place to buy it:`;
-        if (location == "not found") {
-          responseLocation.innerText = "not found";
+        if (typeof storeLocation == "string") {
+          responseLocation.innerText = storeLocation;
         } else {
-          responseLocation.innerText = `${location.place}, ${location.address}`;
+          responseLocation.innerText = `${storeLocation.place}, ${storeLocation.address}`;
           responseLocation.href =
-            "https://www.google.com/maps/place/" + location.address;
+            "https://www.google.com/maps/place/" + storeLocation.address;
         }
 
         responseParagraph.innerText = `
@@ -330,7 +330,7 @@
           return "User location not found";
         }
 
-        if (myLocation == "") return "not found";
+        if (myLocation == "") return "User location not found";
         const response = await fetch("https://1.gpu.garden:8337/near", {
           method: "POST",
           headers: {
@@ -341,7 +341,7 @@
 
         const responseJSON = await response.json();
         if (!responseJSON.place) {
-          return "not found";
+          return "Location not found";
         } else {
           return { place: responseJSON.place, address: responseJSON.address };
         }
